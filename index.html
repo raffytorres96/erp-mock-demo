@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP System - Purchase Order Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #cbd5e0;
+        }
+        
+        .login-section {
+            padding: 40px 30px;
+        }
+        
+        .form-section {
+            padding: 40px 30px;
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .required {
+            color: #e53e3e;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .success-message {
+            display: none;
+            background: #48bb78;
+            color: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .success-message h2 {
+            margin-bottom: 10px;
+        }
+        
+        .po-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+        
+        .navigation {
+            background: #f7fafc;
+            padding: 15px 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .nav-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 20px;
+        }
+        
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        
+        .error {
+            border-color: #e53e3e !important;
+        }
+        
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Enterprise Resource Planning</h1>
+            <p>Purchase Order Management System</p>
+        </div>
+        
+        <div class="navigation">
+            <a href="#" class="nav-link" id="navHome">Home</a>
+            <a href="#" class="nav-link" id="navProcurement">Procurement</a>
+            <a href="#" class="nav-link" id="navCreatePO">Create Purchase Order</a>
+        </div>
+        
+        <!-- Login Section -->
+        <div class="login-section" id="loginSection">
+            <h2 style="margin-bottom: 20px; color: #2d3748;">Login to ERP</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username <span class="required">*</span></label>
+                    <input type="text" id="username" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        
+        <!-- Create PO Section -->
+        <div class="form-section" id="poForm">
+            <h2 style="margin-bottom: 20px; color: #2d3748;">Create New Purchase Order</h2>
+            <form id="createPOForm">
+                <div class="form-group">
+                    <label for="materialCode">Material Code <span class="required">*</span></label>
+                    <input type="text" id="materialCode" name="materialCode" placeholder="e.g., MAT-12345" required>
+                    <div class="error-message" id="errorMaterialCode"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description <span class="required">*</span></label>
+                    <input type="text" id="description" name="description" placeholder="e.g., Laptop HP EliteBook 840" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">Quantity <span class="required">*</span></label>
+                    <input type="number" id="quantity" name="quantity" placeholder="e.g., 10" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="vendor">Vendor <span class="required">*</span></label>
+                    <select id="vendor" name="vendor" required>
+                        <option value="">-- Select Vendor --</option>
+                        <option value="Tech Supply Corp">Tech Supply Corp</option>
+                        <option value="Office Solutions Ltd">Office Solutions Ltd</option>
+                        <option value="Global Procurement Inc">Global Procurement Inc</option>
+                        <option value="Industrial Parts Co">Industrial Parts Co</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="costCenter">Cost Center <span class="required">*</span></label>
+                    <select id="costCenter" name="costCenter" required>
+                        <option value="">-- Select Cost Center --</option>
+                        <option value="CC-IT-2025">CC-IT-2025 (IT Department)</option>
+                        <option value="CC-HR-2025">CC-HR-2025 (HR Department)</option>
+                        <option value="CC-OPS-2025">CC-OPS-2025 (Operations)</option>
+                        <option value="CC-MKT-2025">CC-MKT-2025 (Marketing)</option>
+                    </select>
+                </div>
+                
+                <button type="submit" id="btnSave">Save Purchase Order</button>
+            </form>
+            
+            <div class="success-message" id="successMessage">
+                <h2>✅ Purchase Order Created Successfully!</h2>
+                <p>Your PO Number is:</p>
+                <div class="po-number" id="poNumber">PO-2025-00000</div>
+                <p style="margin-top: 10px; font-size: 14px;">Save this number for your records</p>
+                <button type="button" id="btnNewOrder" style="margin-top: 20px; background: #38a169;">Create New Order</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple validation (for demo purposes)
+            if (username === 'bot_user' && password === 'bot_password') {
+                // Login successful
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('poForm').style.display = 'block';
+            } else {
+                alert('Invalid credentials. Try:\nUsername: bot_user\nPassword: bot_password');
+            }
+        });
+        
+        // Navigation Links
+        document.getElementById('navCreatePO').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (document.getElementById('poForm').style.display === 'block') {
+                // Already on this page
+                return;
+            }
+            // Would navigate here in real app
+            alert('Already on Create Purchase Order page');
+        });
+        
+        // Create PO Form Handler
+        document.getElementById('createPOForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const materialCode = document.getElementById('materialCode').value;
+            const description = document.getElementById('description').value;
+            const quantity = document.getElementById('quantity').value;
+            const vendor = document.getElementById('vendor').value;
+            const costCenter = document.getElementById('costCenter').value;
+            
+            // Validation: Material Code must start with "MAT-"
+            if (!materialCode.startsWith('MAT-')) {
+                document.getElementById('materialCode').classList.add('error');
+                document.getElementById('errorMaterialCode').textContent = 'Material code must start with MAT-';
+                return;
+            } else {
+                document.getElementById('materialCode').classList.remove('error');
+                document.getElementById('errorMaterialCode').textContent = '';
+            }
+            
+            // Generate PO Number
+            const timestamp = new Date().getTime();
+            const poNumber = 'PO-' + new Date().getFullYear() + '-' + String(timestamp).slice(-5);
+            
+            // Store in localStorage (simulate database)
+            const purchaseOrder = {
+                poNumber: poNumber,
+                materialCode: materialCode,
+                description: description,
+                quantity: quantity,
+                vendor: vendor,
+                costCenter: costCenter,
+                createdAt: new Date().toISOString(),
+                status: 'Created'
+            };
+            
+            localStorage.setItem(poNumber, JSON.stringify(purchaseOrder));
+            
+            // Show success message
+            document.getElementById('poNumber').textContent = poNumber;
+            document.getElementById('createPOForm').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // RIMOSSO AUTO-RESET - Il messaggio resta visibile permanentemente
+            // Il bot può così estrarre il PO Number senza fretta
+        });
+        
+        // New Order Button Handler
+        document.getElementById('btnNewOrder').addEventListener('click', function() {
+            document.getElementById('createPOForm').reset();
+            document.getElementById('createPOForm').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
