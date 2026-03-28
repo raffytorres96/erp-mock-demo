@@ -201,7 +201,7 @@ This mock is one component of a larger academic project. The full system integra
 
 ## 👤 Author
 
-**Raffaele Torres**
+**Raffaele Gatta**
 Computer Science Graduate — University of Bari
 Thesis: *BPM + RPA + AI Integration*
 
